@@ -42,7 +42,7 @@ let slice = Array.prototype.slice;
  * @return {Object} instance of coEvent
  * @api public
  */
-let CoEvent = function(opt, ctx) {
+let CoEvent = function(conf, ctx) {
     /*
      * The options object is passed to EventEmitter2: see
      * https://github.com/asyncly/EventEmitter2#differences-non-breaking-compatible-with-existing-eventemitter
@@ -78,7 +78,7 @@ let CoEvent = function(opt, ctx) {
     /**
      *  EventEmitter is instanced and added to object
      */
-    this.opt = opt || {
+    this.opt = {
 
       //
       // set this to `true` to use wildcards. It defaults to `false`.
@@ -100,14 +100,13 @@ let CoEvent = function(opt, ctx) {
       //
       maxListeners: 10
     }
-    this.opt.delimiter = this.opt.delimiter.trim()
-    this.opt.wildcard = this.opt.wildcard === undefined ? false : this.opt.wildcard
-    this.opt.delimiter = this.opt.newListener === undefined ? '.' : this.opt.newListener
-    this.opt.newListener = this.opt.newListener === undefined ? true : this.opt
-      .newListener
-    this.opt.maxListeners = this.opt.maxListeners === undefined ? 10 : this.opt
-      .maxListeners
-    this.emitter = new EventEmitter(opt)
+    conf.delimiter && (this.opt.delimiter = conf.delimiter);
+    conf.maxListeners && (this.opt._events.maxListeners = conf.maxListeners);
+    conf.wildcard && (this.opt.wildcard = conf.wildcard);
+    conf.newListener && (this.opt.newListener = conf.newListener);
+    this.emitter = new EventEmitter(Object.assign(opt, {
+      wildcard: false
+    }))
     this.events = {}
       /**
        *  ctx to be used in every generator
@@ -223,68 +222,74 @@ let CoEvent = function(opt, ctx) {
        * @api public
        */
     this.emit = function(_event, arg) {
-        arg = arguments.length > 2 ?
-          slice.call(arguments, 1) : [arg];
-        return new Promise(function(resolve, reject) {
-          let test = _this.emitter.emit(_event, arg, resolve, reject)
-          if (!test && _event !== 'NotListener' && !(_event.slice(-(4 +
-                _this.opt.delimiter.length)) ===
-              _this.opt.delimiter + 'done' || _event.slice(-(5 + _this.opt.delimiter
-                .length)) ===
-              _this.opt.delimiter + 'error')) {
-            _this.emit('NotListener', _event, arg).then(resolve).catch(
-              reject)
-          } else if (!test) {
-            resolve()
-          }
-        });
-      }
-      /**
-       * @param {Object}arg {Array} generators {Number} index of array of generators
-       * @return {function} chained
-       * @api private
-       */
-    chaining = function(arg, array, index) {
-        if (array.length === 1) {
-          return array[0].apply(_this.ctx, arg)
-        } else if (array.length === 2) {
-          return array[0].apply(_this.ctx, arg.concat(array[1].apply(
-            _this.ctx,
-            arg)))
-        } else if (index < (array.length - 2)) {
-          return array[index].apply(_this.ctx, arg.concat(chaining(arg,
-            array,
-            index +
-            1)))
-        } else {
-          return array[index].apply(_this.ctx, arg.concat(array[
-              (index + 1) % array.length]
-            .apply(
-              _this.ctx,
-              arg)))
-        }
-
-      }
-      /**
-       * @param {Array} map the arg to be a generators
-       * @api private
-       */
-    toGenerator = function(fns) {
-      fns = Array.isArray(fns) ? fns : [fns]
-      return fns.map(function(fn) {
-        if (fn.constructor.name === 'GeneratorFunction') {
-          return fn
-        } else if (typeof fn === 'function') {
-          return function*() {
-            let arg = slice.call(arguments, 0)
-            yield toGenerator(fn.apply(_this.ctx, arg))
-          }
-        }
-        return fn
-      })
+      arg = arguments.length > 2 ?
+        slice.call(arguments, 1) : [arg];
     }
+    return new Promise(function(resolve, reject) {
+      let test = _this.emitter.emit(_event, arg, resolve,
+        reject)
+      if (!test && _event !== 'NotListener' && !(_event.slice(-
+            (4 +
+              _this.opt.delimiter.length)) ===
+          _this.opt.delimiter + 'done' || _event.slice(-(5 +
+            _this.opt
+            .delimiter
+            .length)) ===
+          _this.opt.delimiter + 'error')) {
+        _this.emit('NotListener', _event, arg).then(resolve).catch(
+          reject)
+      } else if (!test) {
+        resolve()
+      }
+    });
   }
   /**
-   * Expose `coEvent`.
+   * @param {Object}arg {Array} generators {Number} index of array of generators
+   * @return {function} chained
+   * @api private
    */
+chaining = function(arg, array, index) {
+    if (array.length === 1) {
+      return array[0].apply(_this.ctx, arg)
+    } else if (array.length === 2) {
+      return array[0].apply(_this.ctx, arg.concat(array[1].apply(
+        _this.ctx,
+        arg)))
+    } else if (index < (array.length - 2)) {
+      return array[index].apply(_this.ctx, arg.concat(chaining(
+        arg,
+        array,
+        index +
+        1)))
+    } else {
+      return array[index].apply(_this.ctx, arg.concat(array[
+          (index + 1) % array.length]
+        .apply(
+          _this.ctx,
+          arg)))
+    }
+
+  }
+  /**
+   * @param {Array} map the arg to be a generators
+   * @api private
+   */
+toGenerator = function(fns) {
+  fns = Array.isArray(fns) ? fns : [fns]
+  return fns.map(function(fn) {
+    if (fn.constructor.name === 'GeneratorFunction') {
+      return fn
+    } else if (typeof fn === 'function') {
+      return function*() {
+        let arg = slice.call(arguments, 0)
+        yield toGenerator(fn.apply(_this.ctx, arg))
+      }
+    }
+    return fn
+  })
+}
+}
+/**
+ * Expose `coEvent`.
+ */
 module.exports = CoEvent
