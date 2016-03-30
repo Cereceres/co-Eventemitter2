@@ -1,25 +1,22 @@
 
 
-# co-eventemitter
-[![Inline docs](http://inch-ci.org/github/Cereceres/co-Eventemitter.svg?branch=master)](http://inch-ci.org/github/Cereceres/co-Eventemitter)
-[![Circle CI](https://circleci.com/gh/Cereceres/co-Eventemitter.svg?style=svg)](https://circleci.com/gh/Cereceres/co-Eventemitter)
+# co-eventemitter2
 
-
-co-eventemitter for JavaScript
+co-eventemitter2 for JavaScript
 
 # Installing
 
 ```bash
-$ npm install co-eventemitter
+$ npm install co-eventemitter2
 ```
 
 # Getting starter
 
 ```js
 
-let CoEvent = require( 'co-eventemitter' )
-let coEvent = new CoEvent() // you can pass a object to co-eventemitter constructor
-// that will be used or passed as thisArg to every generator.
+let CoEvent = require( 'co-eventemitter2' )
+let coEvent = new CoEvent() // you can pass a two object as params to co-eventemitter2 constructor
+// that will be the option to EventEmitter2 and thisArg used or passed as thisArg to every generator.
 ```
 # Usage
 
@@ -63,27 +60,27 @@ assert.equal( count,2 )
 // Also can use once method exposed to CoEvent to use generators wrapper
 // with co.
 ```
-### `Class Co-eventemitter`
-#### `Co-eventemitter([thisArg])`
-To instance the co-eventemitter you can pass a thisArg object what will be passed to every generator as thisArg.
+### `Class Co-eventemitter2`
+#### `Co-eventemitter2([options,thisArg])`
+To instance the co-eventemitter2 you can pass a thisArg object what will be passed to every generator as thisArg.
 
-### `Instance Co-eventemitter`
-#### `co-eventemitter.on(String,Generator[,Generator...])`
+### `Instance Co-eventemitter2`
+#### `co-eventemitter2.on(String,Generator[,Generator...])`
 This method added the Generators passed to event Handler of event given(String). Returns itself.
 
-#### `co-eventemitter.once(String,Generator[,Generator...])`
+#### `co-eventemitter2.once(String,Generator[,Generator...])`
 This method added the Generators passed to event Handler of event given(String) to be emitted only one time. Returns itself.
 
-#### `co-eventemitter.emit(String,Object[,Object...])`
+#### `co-eventemitter2.emit(String,Object[,Object...])`
 This method emit the event event given(String) and pass every Object argument to every constructor. Returns a promise that is resolved when the every generator of event is finished or rejected if a error happen. If a error is through the error event is emitted or if a listener is not found the event "NotListener" also is through and the promise is resolved with the event name emitted.
 
-#### `co-eventemitter.emitter`
-Instance of EventEmitter, every change here affect to co-eventemitter instance.
+#### `co-eventemitter2.emitter`
+Instance of EventEmitter, every change here affect to co-eventemitter2 instance.
 
-#### `co-eventemitter.events`
+#### `co-eventemitter2.events`
 Object where the keys are the events added and values are arrays with the listers generators to every event.
 
-#### `co-eventemitter.ctx`
+#### `co-eventemitter2.ctx`
 thisArg passed to every generator, this is the same passed to constructor and can be
 upgraded at any time.
 ### `Events`
@@ -91,7 +88,7 @@ upgraded at any time.
 to every event listened with listeners added a event is emitted when the promise is finished or a error is catched, this events are 'event+":done"' and  'event+":error"'
 
 #### `NotListener`
-This event is emitted when the event does not have listener and emitted wuth the event name. 
+This event is emitted when the event does not have listener and emitted wuth the event name.
 # Testing
 
 Running the tests
