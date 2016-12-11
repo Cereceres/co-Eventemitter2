@@ -10,7 +10,9 @@
     "co": "^4.6.0",
     "eventemitter2": "^1.0.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "^3.2.0"
+  },
   "scripts": {
     "test": "mocha test/test.js"
   },
