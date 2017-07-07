@@ -7,5 +7,3 @@ install:
   - npm install mocha -g
 script:
   - npm test
-services:
-  - mongodb
