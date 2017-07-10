@@ -1,4 +1,4 @@
-
+[![Build Status](https://travis-ci.org/Cereceres/co-Eventemitter2.svg?branch=master)](https://travis-ci.org/Cereceres/co-Eventemitter2)
 
 # co-eventemitter2
 
